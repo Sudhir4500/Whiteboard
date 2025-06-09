@@ -1,0 +1,45 @@
+from channels.generic.websocket import AsyncWebsocketConsumer
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+class WhiteboardConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.room_group_name = f'whiteboard_{self.room_name}'
+
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        await self.accept()
+        logger.info(f"Connected to room: {self.room_group_name}")
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+        logger.info(f"Disconnected from room: {self.room_group_name}")
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        event_type = data.get("type")
+
+        if event_type == "draw_event":
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "broadcast_draw",
+                    "payload": data
+                }
+            )
+            logger.info(f"Broadcasting draw_event: {data}")
+        else:
+            logger.warning(f"Unknown event type received: {event_type}")
+
+        print(f"Received data: {data}")
+
+    async def broadcast_draw(self, event):
+        await self.send(text_data=json.dumps(event["payload"]))

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Whiteboard Room</title>
+    <style>
+        canvas { border: 1px solid #000; }
+    </style>
+</head>
+<body>
+    <h2>Room: {{ room_name }}</h2>
+    <canvas id="whiteboard" width="800" height="600"></canvas>
+
+    <script>
+        const roomName = "{{ room_name }}";
+        const ws = new WebSocket(`ws://${window.location.host}/ws/whiteboard/${roomName}/`);
+
+        const canvas = document.getElementById("whiteboard");
+        const ctx = canvas.getContext("2d");
+        let drawing = false;
+
+        canvas.addEventListener("mousedown", (e) => {
+            drawing = true;
+            lastX = e.offsetX;
+            lastY = e.offsetY;
+        });
+
+        canvas.addEventListener("mouseup", () => drawing = false);
+        canvas.addEventListener("mouseout", () => drawing = false);
+
+        canvas.addEventListener("mousemove", (e) => {
+            if (!drawing) return;
+            const msg = {
+                type: "draw_event",
+                tool: "pen",
+                color: "#ff0000",
+                from: { x: lastX, y: lastY },
+                to: { x: e.offsetX, y: e.offsetY },
+                width: 2
+            };
+            ws.send(JSON.stringify(msg));
+            draw(msg);
+            lastX = e.offsetX;
+            lastY = e.offsetY;
+        });
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === "draw_event") {
+                draw(data);
+            }
+        };
+
+        function draw(data) {
+            ctx.strokeStyle = data.color;
+            ctx.lineWidth = data.width;
+            ctx.beginPath();
+            ctx.moveTo(data.from.x, data.from.y);
+            ctx.lineTo(data.to.x, data.to.y);
+            ctx.stroke();
+        }
+    </script>
+</body>
+</html>

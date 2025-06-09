@@ -1,0 +1,32 @@
+# Byte-compiled / optimized Python files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+env/
+
+# Django settings
+*.log
+*.pot
+*.pyc
+local_settings.py
+
+# Media files
+media/
+
+# Static files
+staticfiles/
+
+# Database
+db.sqlite3
+
+# IDE specific files
+.idea/
+.vscode/
+
+# Compiled Python files
+*.pyc
+
+# macOS specific
+.DS_Store
