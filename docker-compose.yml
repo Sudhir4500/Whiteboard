@@ -1,3 +1,4 @@
+version: '3.9'
 
 services:
   redis:
@@ -17,3 +18,4 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - DJANGO_SETTINGS_MODULE=whiteboard_project.settings

@@ -1,0 +1,29 @@
+<!-- templates/whiteboard/expired.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Expired</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2em; text-align: center; }
+        h2 { color: #333; }
+        a { 
+            display: inline-block; 
+            margin: 1em; 
+            padding: 0.5em 1em; 
+            background: #007bff; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 4px; 
+        }
+        a:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h2>Room "{{ room_name|escape }}" has expired.</h2>
+    <p>Please create a new room or join another one.</p>
+    <a href="{% url 'whiteboard:homepage' %}">Back to Homepage</a>
+    <a href="{% url 'whiteboard:create_temp_room' %}">Create New Room</a>
+</body>
+</html>

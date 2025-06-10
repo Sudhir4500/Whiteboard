@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+
+import os
+
+import urllib.parse
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,6 +48,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # For serving static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -128,15 +134,31 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ASGI_APPLICATION = 'whiteboard_project.asgi.application'
 
 # Channel layers configuration
-import os
+
+
+redis_url = os.getenv("REDIS_URL")
+
+if redis_url:
+    parsed_url = urllib.parse.urlparse(redis_url)
+    redis_host = parsed_url.hostname
+    redis_port = parsed_url.port
+    redis_password = parsed_url.password
+    redis_config = {
+        "hosts": [(redis_host, redis_port)],
+    }
+    if redis_password:
+        redis_config["password"] = redis_password
+else:
+    # fallback to local Redis
+    redis_config = {
+        "hosts": [("localhost", 6379)],
+    }
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(os.getenv("REDIS_HOST", "localhost"), int(os.getenv("REDIS_PORT", 6379)))],
-        },
-    },
+        "CONFIG": redis_config,
+    }
 }
 
 # logging configuration
@@ -154,3 +176,5 @@ LOGGING = {
     },
 }
 
+# Static files storage configuration
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

@@ -1,0 +1,60 @@
+<!-- templates/whiteboard/homepage.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Whiteboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2em; max-width: 800px; margin: 0 auto; }
+        h1 { color: #333; }
+        .form-group { margin: 1.5em 0; }
+        label { font-size: 1.2em; margin-right: 0.5em; }
+        input[type="text"] { 
+            padding: 0.5em; 
+            width: 100%; 
+            max-width: 300px; 
+            font-size: 1em; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+        }
+        button { 
+            padding: 0.5em 1em; 
+            font-size: 1em; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+        button:hover { background: #0056b3; }
+        .error { color: #dc3545; margin-top: 1em; }
+        .new-room-link { 
+            display: inline-block; 
+            margin-left: 1em; 
+            color: #007bff; 
+            text-decoration: none; 
+        }
+        .new-room-link:hover { text-decoration: underline; }
+        @media (max-width: 600px) {
+            .form-group { flex-direction: column; }
+            button, .new-room-link { margin-top: 0.5em; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Join or Create a Whiteboard Room</h1>
+    <form method="POST" action="" class="form-group">
+        {% csrf_token %}
+        <label for="room_name">Room Name:</label>
+        <input type="text" id="room_name" name="room_name" placeholder="e.g., team123" required aria-describedby="room_name_help" />
+        <div>
+            <button type="submit">Join Room</button>
+            <a href="{% url 'whiteboard:create_temp_room' %}" class="new-room-link">Create New Room</a>
+        </div>
+    </form>
+    {% if error %}
+        <div class="error" role="alert">{{ error|escape }}</div>
+    {% endif %}
+</body>
+</html>
